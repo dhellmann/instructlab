@@ -42,6 +42,16 @@ RUN python3.11 -m pip install -vv --no-cache-dir \
     nvidia-nvtx-cu12==12.1.105 \
     pydantic-core==2.18.2
 
-RUN CMAKE_ARGS="-DLLAMA_CUBLAS=on" python3.11 -m pip install -r https://raw.githubusercontent.com/instructlab/instructlab/stable/requirements.txt --force-reinstall --no-cache-dir llama-cpp-python
-RUN python3.11 -m pip install git+https://github.com/instructlab/instructlab.git@stable
+# Install instructlab and its dependencies using wheels published to
+# the PyAI package server. The verbose level is turned up so we can
+# examine the logs to verify where packages are coming from.
+#
+# Do not --force-reinstall here because some packages are not
+# available on this server.
+RUN python3.11 -m pip install -vv \
+    --no-cache-dir \
+    --index-url https://pyai.fedorainfracloud.org/experimental/cuda-ubi9/+simple/ \
+    instructlab==0.14.1 \
+    && python3.11 -m pip freeze
+
 CMD ["/bin/bash"]
